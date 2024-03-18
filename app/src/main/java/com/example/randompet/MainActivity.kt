@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getNextImage(button: Button, imageView: ImageView) {
         button.setOnClickListener {
-            var randNum = Random.nextInt(2)
+            val randNum = Random.nextInt(2)
             if (randNum == 1) {
                 getDogImageURL()
             } else {
@@ -71,8 +71,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var button = findViewById<Button>(R.id.petButton)
-        var imageView = findViewById<ImageView>(R.id.petImage)
+        val button = findViewById<Button>(R.id.petButton)
+        val imageView = findViewById<ImageView>(R.id.petImage)
 
         getDogImageURL()
         getNextImage(button, imageView)

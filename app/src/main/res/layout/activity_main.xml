@@ -23,6 +23,6 @@
         app:layout_constraintTop_toBottomOf="@id/petImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="Get a Random Pet"/>
+        android:text="@string/get_a_random_pet"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
