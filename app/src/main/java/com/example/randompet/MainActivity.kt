@@ -5,6 +5,9 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.codepath.asynchttpclient.AsyncHttpClient
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
@@ -13,12 +16,22 @@ import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
     var petImageUrl = ""
+    private lateinit var petList : MutableList<String>
+    private lateinit var rvPets : RecyclerView
     private fun getDogImageURL() {
         val client = AsyncHttpClient()
-        client["https://dog.ceo/api/breeds/image/random", object : JsonHttpResponseHandler() {
+        client["https://dog.ceo/api/breeds/image/random/20", object : JsonHttpResponseHandler() {
             override fun onSuccess(statusCode: Int, headers: Headers, json: JsonHttpResponseHandler.JSON) {
                 Log.d("Dog", "response successful$json")
-                petImageUrl = json.jsonObject.getString("message")
+                val petImageArray = json.jsonObject.getJSONArray("message")
+                for (i in 0 until petImageArray.length()) {
+                    petList.add(petImageArray.getString(i))
+                }
+
+                val adapter = PetAdapter(petList)
+                rvPets.adapter = adapter
+                rvPets.layoutManager = LinearLayoutManager(this@MainActivity)
+                rvPets.addItemDecoration(DividerItemDecoration(this@MainActivity, LinearLayoutManager.VERTICAL))
             }
 
             override fun onFailure(
@@ -32,50 +45,15 @@ class MainActivity : AppCompatActivity() {
         }]
     }
 
-    private fun getCatImageURL() {
-        val client = AsyncHttpClient()
-        client["https://api.thecatapi.com/v1/images/search", object : JsonHttpResponseHandler() {
-            override fun onSuccess(statusCode: Int, headers: Headers, json: JsonHttpResponseHandler.JSON) {
-                Log.d("Cat", "response successful$json")
-                petImageUrl = json.jsonArray.getJSONObject(0).getString("url")
-            }
-
-            override fun onFailure(
-                statusCode: Int,
-                headers: Headers?,
-                errorResponse: String,
-                throwable: Throwable?
-            ) {
-                Log.d("Cat Error", errorResponse)
-            }
-        }]
-    }
-
-    private fun getNextImage(button: Button, imageView: ImageView) {
-        button.setOnClickListener {
-            val randNum = Random.nextInt(2)
-            if (randNum == 1) {
-                getDogImageURL()
-            } else {
-                getCatImageURL()
-            }
-
-            Glide.with(this)
-                .load(petImageUrl)
-                .fitCenter()
-                .into(imageView)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val button = findViewById<Button>(R.id.petButton)
-        val imageView = findViewById<ImageView>(R.id.petImage)
+        petList = mutableListOf()
+        rvPets = findViewById(R.id.pet_rv)
 
         getDogImageURL()
-        getNextImage(button, imageView)
+        // getNextImage(button, imageView)
         Log.d("petImageUrl", "pet image url set")
     }
 }
